@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>QR Code Testing</title>
+    <script type="module">
+      import { makeQrCode } from "./dist/jgqr.min.mjs";
+
+      window.onload = () => {
+        const randomCanvas = () => {
+          const numChars = 1 + Math.floor(Math.random() * 1000);
+          const str = new Array(numChars).fill("x").join("");
+
+          const { sideLength, path } = makeQrCode("H", str);
+
+          document.body.innerHTML = `
+            <svg width="320" height="320" viewBox="0 0 ${sideLength} ${sideLength}" xmlns="http://www.w3.org/2000/svg">
+              <style>path {stroke: black;}</style>
+              <path d="${path}" />
+            </svg>`;
+        };
+
+        setInterval(randomCanvas, 1000);
+        randomCanvas();
+      };
+    </script>
+  </head>
+  <body></body>
+</html>
