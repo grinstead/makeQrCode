@@ -568,12 +568,15 @@ export function makeQrCode(level, string) {
   encoded[2] = contentByteCount >> 8;
   encoded[3] = contentByteCount & 0xff;
 
-  const options = BLOCK_DATA[levelBits];
+  const options = BLOCK_DATA.split("|")[levelBits];
   let qrVersion = 1;
   let blockInfo = 0;
   let numDataBytes = 0;
   do {
-    blockInfo = options[qrVersion - 1];
+    blockInfo = parseInt(
+      options.substring(qrVersion * 4 - 4, qrVersion * 4),
+      32
+    );
     numDataBytes += getAdditionalByteCount(blockInfo);
   } while (
     contentByteCount + (qrVersion < TWO_BYTE_LENGTH_THRESHOLD ? 3 : 4) >
