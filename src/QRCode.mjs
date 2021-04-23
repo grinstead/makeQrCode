@@ -10,7 +10,7 @@ import {
   GENERATOR_DATA,
   BLOCK_DATA,
   getNumBlocks,
-  getEncodableByteCount,
+  getAdditionalByteCount,
   getGeneratorIndex,
 } from "./RawQRCodeData.mjs";
 
@@ -574,7 +574,7 @@ export function makeQrCode(level, string) {
   let numDataBytes = 0;
   do {
     blockInfo = options[qrVersion - 1];
-    numDataBytes = getEncodableByteCount(blockInfo);
+    numDataBytes += getAdditionalByteCount(blockInfo);
   } while (
     contentByteCount + (qrVersion < TWO_BYTE_LENGTH_THRESHOLD ? 3 : 4) >
       numDataBytes &&

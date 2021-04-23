@@ -2,7 +2,7 @@ function getGeneratorIndex(data) {
   return data & 0xf;
 }
 
-function getEncodableByteCount(data) {
+function getAdditionalByteCount(data) {
   return data >> 11;
 }
 
@@ -149,6 +149,7 @@ function generateDataFile() {
   );
 
   const computeArray = (quality) => {
+    let priorByteCount = 0;
     return rows.map((row) => {
       const blockData = row[quality].blockData;
 
@@ -166,17 +167,21 @@ function generateDataFile() {
       );
       if (generatorIndex === -1) throw Error();
 
+      const additionalByteCount = numEncodableBytes - priorByteCount;
+
       const union =
-        (numEncodableBytes << 11) | (numBlocks << 4) | generatorIndex;
+        (additionalByteCount << 11) | (numBlocks << 4) | generatorIndex;
 
       // sanity check
       if (
-        numEncodableBytes !== getEncodableByteCount(union) ||
+        additionalByteCount !== getAdditionalByteCount(union) ||
         numBlocks !== getNumBlocks(union) ||
         generatorIndex !== getGeneratorIndex(union)
       ) {
         throw Error("bad encoding");
       }
+
+      priorByteCount = numEncodableBytes;
 
       return union;
     });
@@ -193,7 +198,7 @@ function generateDataFile() {
 
 export ${getGeneratorIndex}
 
-export ${getEncodableByteCount}
+export ${getAdditionalByteCount}
 
 export ${getNumBlocks}
 
@@ -205,6 +210,7 @@ export const GENERATOR_DATA =
  * Packed data structures representing the qr code data info
  * for each error-correction level, sorted M L H Q (the bit-order)
  */
+// prettier-ignore
 export const BLOCK_DATA = [
   ${JSON.stringify(data.M)},
   ${JSON.stringify(data.L)},
