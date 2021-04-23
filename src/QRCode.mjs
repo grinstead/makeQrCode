@@ -6,7 +6,13 @@ import {
   writeValue,
   makePath,
 } from "./BitCanvas.mjs";
-import { GENERATOR_DATA, BLOCK_DATA } from "./RawQRCodeData.mjs";
+import {
+  GENERATOR_DATA,
+  BLOCK_DATA,
+  getNumBlocks,
+  getEncodableByteCount,
+  getGeneratorIndex,
+} from "./RawQRCodeData.mjs";
 
 const ORIENTATION_LENGTH = 7;
 const ALIGNMENT_LENGTH = 5;
@@ -568,7 +574,7 @@ export function makeQrCode(level, string) {
   let numDataBytes = 0;
   do {
     blockInfo = options[qrVersion - 1];
-    numDataBytes = blockInfo >> 12;
+    numDataBytes = getEncodableByteCount(blockInfo);
   } while (
     contentByteCount + (qrVersion < TWO_BYTE_LENGTH_THRESHOLD ? 3 : 4) >
       numDataBytes &&
@@ -585,9 +591,9 @@ export function makeQrCode(level, string) {
   // pad 0s
   while (encoded.push(0) < numDataBytes) {}
 
-  const generator = GENERATOR_DATA.split("|")[blockInfo & 0x1f];
+  const generator = GENERATOR_DATA.split("|")[getGeneratorIndex(blockInfo)];
   const numErrorBytesPerBlock = generator.length / 2;
-  const numBlocks = (blockInfo >> 5) & 0x7f;
+  const numBlocks = getNumBlocks(blockInfo);
 
   const blocks = [];
   const numDataBytesPerBlock = Math.floor(numDataBytes / numBlocks);

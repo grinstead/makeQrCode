@@ -11,7 +11,10 @@
           const numChars = 1 + Math.floor(Math.random() * 1000);
           const str = new Array(numChars).fill("x").join("");
 
-          const { sideLength, path } = makeQrCode("H", str);
+          const { sideLength, path } = makeQrCode(
+            "LMQH"[(4 * Math.random()) | 0],
+            str
+          );
 
           document.body.innerHTML = `
             <svg width="320" height="320" viewBox="0 0 ${sideLength} ${sideLength}" xmlns="http://www.w3.org/2000/svg">
