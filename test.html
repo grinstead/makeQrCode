@@ -4,17 +4,16 @@
     <meta charset="UTF-8" />
     <title>QR Code Testing</title>
     <script type="module">
+      // import { makeQrCode } from "./src/QRCode.mjs";
       import { makeQrCode } from "./dist/jgqr.min.mjs";
 
       window.onload = () => {
         const randomCanvas = () => {
           const numChars = 1 + Math.floor(Math.random() * 1000);
           const str = new Array(numChars).fill("x").join("");
+          const level = "LMQH"[(4 * Math.random()) | 0];
 
-          const { sideLength, path } = makeQrCode(
-            "LMQH"[(4 * Math.random()) | 0],
-            str
-          );
+          const { sideLength, path } = makeQrCode(level, str);
 
           document.body.innerHTML = `
             <svg width="320" height="320" viewBox="0 0 ${sideLength} ${sideLength}" xmlns="http://www.w3.org/2000/svg">
@@ -23,7 +22,7 @@
             </svg>`;
         };
 
-        setInterval(randomCanvas, 1000);
+        // setInterval(randomCanvas, 1000);
         randomCanvas();
       };
     </script>

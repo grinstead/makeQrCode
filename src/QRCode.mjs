@@ -13,6 +13,8 @@ import {
   getAdditionalByteCount,
   getGeneratorIndex,
 } from "./RawQRCodeData.mjs";
+import { segmentData, QrLevelLength } from "./QrEncoding.mjs";
+import { encodeData } from "./QrEncoding.mjs";
 
 const ORIENTATION_LENGTH = 7;
 const ALIGNMENT_LENGTH = 5;
@@ -525,74 +527,29 @@ export function makeQrCode(level, string) {
   const levelBits = ERROR_CORRECTION_BITVALUES.indexOf(level);
   if (levelBits < 0) return; // error, not one of L M Q or H
 
-  // starts with the utf8 header, which is 0111 (Extended Channel Interpretation)
-  // the type 00011001 (utf8) and a footer saying to read bytes, the last two
-  // numbers will represent the number of characters
-  const encoded = [0b01110001, 0b10100100, 0, 0];
-  for (let i = 0; i < string.length; i++) {
-    let codepoint = string.charCodeAt(i);
-    if ((0xfc00 & codepoint) === 0xd800) {
-      // note that this implicitly returns NaN if i === string.length - 1
-      // which will get "correctly" encoded as the raw value in utf8
-      // basically, if we run into lone surrogate pairs, we encode
-      // them into the utf8
-      const nextChar = string.charCodeAt(i + 1);
-
-      if ((0xfc00 & nextChar) === 0xdc00) {
-        const rawBits = ((codepoint & 0x3ff) << 10) | (nextChar & 0x3ff);
-        codepoint = rawBits + 0x10000;
-      }
-    }
-
-    if (codepoint < 1 << 7) {
-      encoded.push(codepoint);
-    } else if (codepoint < 1 << 11) {
-      encoded.push(0xc0 | (codepoint >> 6), 0x80 | (codepoint & 0x3f));
-    } else if (codepoint < 1 << 16) {
-      encoded.push(
-        0xe0 | (codepoint >> 12),
-        0x80 | ((codepoint >> 6) & 0x3f),
-        0x80 | (codepoint & 0x3f)
-      );
-    } else {
-      encoded.push(
-        0xf0 | (codepoint >> 18),
-        0x80 | ((codepoint >> 12) & 0x3f),
-        0x80 | ((codepoint >> 6) & 0x3f),
-        0x80 | (codepoint & 0x3f)
-      );
-    }
-  }
-
-  const contentByteCount = encoded.length - 4;
-  encoded[2] = contentByteCount >> 8;
-  encoded[3] = contentByteCount & 0xff;
+  const segments = segmentData(string);
 
   const options = BLOCK_DATA.split("|")[levelBits];
   let qrVersion = 1;
-  let blockInfo = 0;
   let numDataBytes = 0;
+  let qrLevel, blockInfo;
   do {
+    qrLevel =
+      (qrVersion >= QrLevelLength.MID) + (qrVersion >= QrLevelLength.LONG);
+
     blockInfo = parseInt(
       options.substring(qrVersion * 4 - 4, qrVersion * 4),
       32
     );
     numDataBytes += getAdditionalByteCount(blockInfo);
   } while (
-    contentByteCount + (qrVersion < TWO_BYTE_LENGTH_THRESHOLD ? 3 : 4) >
-      numDataBytes &&
+    segments[qrLevel].numBits > 8 * numDataBytes &&
     ++qrVersion <= MAX_QR_VERSION
   );
 
   if (qrVersion > MAX_QR_VERSION) return;
 
-  // remove the extra length byte if it was unnecessary
-  if (qrVersion < TWO_BYTE_LENGTH_THRESHOLD) {
-    encoded.splice(2, 1);
-  }
-
-  // pad 0s
-  while (encoded.push(0) < numDataBytes) {}
+  const encoded = encodeData(numDataBytes, qrLevel, segments[qrLevel].segments);
 
   const generator = GENERATOR_DATA.split("|")[getGeneratorIndex(blockInfo)];
   const numErrorBytesPerBlock = generator.length / 2;
