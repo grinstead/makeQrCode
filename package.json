@@ -1,14 +1,14 @@
 {
-  "name": "jg-qr",
+  "name": "makeQrCode",
   "version": "1.0.0",
-  "description": "Joe Grinstead's QR Code Generator",
-  "main": "src/index.js",
-  "repository": "git@github.com:grinstead/jgqr.git",
+  "description": "Pure JS QR Code Generator by Joe Grinstead",
+  "main": "dist/makeQrCode.min.mjs",
+  "repository": "git@github.com:grinstead/makeQrCode.git",
   "author": "Joe Grinstead",
   "license": "BSD-2-Clause",
   "private": false,
   "scripts": {
-    "build": "yarn google-closure-compiler --js='src/**.mjs' --js='src/**.js' --language_out=ECMASCRIPT5_STRICT --strict_mode_input --assume_function_wrapper --entry_point=src/index.js --dependency_mode=PRUNE --inject_libraries=false --compilation_level=ADVANCED --js_output_file=dist/jgqr.min.mjs && sed -i '' 's/window\\.\\(.*\\)=function(/export function \\1(/g' dist/jgqr.min.mjs"
+    "build": "yarn google-closure-compiler --js='src/**.mjs' --js='src/**.js' --language_out=ECMASCRIPT5_STRICT --strict_mode_input --assume_function_wrapper --entry_point=src/index.js --dependency_mode=PRUNE --inject_libraries=false --compilation_level=ADVANCED --js_output_file=dist/makeQrCode.min.mjs && sed -i '' 's/window\\.\\(.*\\)=function(/export function \\1(/g' dist/makeQrCode.min.mjs"
   },
   "devDependencies": {
     "google-closure-compiler": "^20210406.0.0"
