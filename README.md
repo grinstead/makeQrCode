@@ -1,6 +1,10 @@
-# Joe Grinstead's QRCode Generator
+# QRCode Generator (by Joe Grinstead)
 
-This is a simple and tiny (7kb) QRCode generating library. It has one function, `makeQrCode(errorCorrectionLevel, dataToEncode)`, which outputs an svg path that you can then place into the dom. It gives a raw svg path instead of the full svg so that you can style the path however you like.
+This is a simple and tiny (< 5kb!) QRCode generating library. It has one function:
+```javascript
+makeQrCode(errorCorrectionLevel, dataToEncode)
+```
+which outputs an svg path that you can then place into the dom. It gives a raw svg path instead of the full svg so that you can style the path however you like.
 
 ## Error Correction Levels
 QRCodes come with some error-correcting bits, so that if a part of the code is misread (or torn off, if this were some kind of sticker), then the damaged part could be potentially recovered.
@@ -16,7 +20,7 @@ The higher the error-correction, the more bits you need to encode all the data, 
 ## Example
 
 ```
-import {makeQrCode} from "jg-qr";
+import {makeQrCode} from "@grinstead/makeQrCode";
 
 const str = "Hello, World!";
 
@@ -32,3 +36,5 @@ document.body.innerHTML = `
   </svg>`;
 ```
 
+## Supported Characters
+QR Codes have several character dictionaries that are optimized. However, for simplicity, this library encodes everything as utf8 (which supports every character). This means that your generated QR Code may be "busier" (more pixels). In theory, it is possible to get better encoding performance for all-numbers or capitalized urls, but that is not implemented in this library. If you're interested in the library generating the most optimized character set, let me know!
