@@ -59,6 +59,7 @@ export function segmentData(data) {
       const nextChar = data.charCodeAt(i + 1);
 
       if ((0xfc00 & nextChar) === 0xdc00) {
+        i++;
         const rawBits = ((codepoint & 0x3ff) << 10) | (nextChar & 0x3ff);
         codepoint = rawBits + 0x10000;
       }
