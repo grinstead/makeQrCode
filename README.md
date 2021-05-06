@@ -20,7 +20,7 @@ The higher the error-correction, the more bits you need to encode all the data, 
 ## Example
 
 ```
-import {makeQrCode} from "@grinstead/makeQrCode";
+import {makeQrCode} from "@grinstead/makeqrcode";
 
 const str = "Hello, World!";
 
