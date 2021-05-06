@@ -1,6 +1,6 @@
 {
   "name": "@grinstead/makeqrcode",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Pure JS QR Code Generator by Joe Grinstead",
   "main": "dist/makeQrCode.min.mjs",
   "repository": {
