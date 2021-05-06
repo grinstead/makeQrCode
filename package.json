@@ -1,9 +1,12 @@
 {
-  "name": "makeQrCode",
+  "name": "@grinstead/makeqrcode",
   "version": "1.0.0",
   "description": "Pure JS QR Code Generator by Joe Grinstead",
   "main": "dist/makeQrCode.min.mjs",
-  "repository": "git@github.com:grinstead/makeQrCode.git",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/grinstead/makeQrCode.git"
+  },
   "author": "Joe Grinstead",
   "license": "BSD-2-Clause",
   "private": false,
@@ -12,5 +15,14 @@
   },
   "devDependencies": {
     "google-closure-compiler": "^20210406.0.0"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/grinstead/makeQrCode/issues"
+  },
+  "homepage": "https://github.com/grinstead/makeQrCode#readme",
+  "keywords": [
+    "qr",
+    "qrcode",
+    "barcode"
+  ]
 }
