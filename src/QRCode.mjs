@@ -525,7 +525,9 @@ function scoreMask(canvas, mask, rectData) {
 
 export function makeQrCode(level, string) {
   const levelBits = ERROR_CORRECTION_BITVALUES.indexOf(level);
-  if (levelBits < 0) return; // error, not one of L M Q or H
+  if (levelBits < 0 || typeof string !== "string") {
+    throw new Error("Bad arguments to makeQrCode");
+  }
 
   const segments = segmentData(string);
 
@@ -547,7 +549,9 @@ export function makeQrCode(level, string) {
     ++qrVersion <= MAX_QR_VERSION
   );
 
-  if (qrVersion > MAX_QR_VERSION) return;
+  if (qrVersion > MAX_QR_VERSION) {
+    throw new Error("Data amount exceeds limits of QR Code");
+  }
 
   const encoded = encodeData(numDataBytes, qrLevel, segments[qrLevel].segments);
 
