@@ -492,7 +492,7 @@ function scoreMask(canvas, mask, rectData) {
 
   // Score approximately equal amounts of white/black squares
   const percentageOff = Math.abs(numBlack / (size * size) - 0.5);
-  score += 10 * Math.floor(20 * percentageOff);
+  score += 10 * ((20 * percentageOff) | 0);
 
   // Look for black-white-black-black-black-white-black
   // which looks like the big targets
@@ -526,7 +526,7 @@ function scoreMask(canvas, mask, rectData) {
 export function makeQrCode(level, string) {
   const levelBits = ERROR_CORRECTION_BITVALUES.indexOf(level);
   if (levelBits < 0 || typeof string !== "string") {
-    throw new Error("Bad arguments to makeQrCode");
+    throw new Error("Bad args");
   }
 
   const segments = segmentData(string);
@@ -550,7 +550,7 @@ export function makeQrCode(level, string) {
   );
 
   if (qrVersion > MAX_QR_VERSION) {
-    throw new Error("Data amount exceeds limits of QR Code");
+    throw new Error("Data beyond QR capacity");
   }
 
   const encoded = encodeData(numDataBytes, qrLevel, segments[qrLevel].segments);

@@ -108,7 +108,7 @@ export function segmentData(data) {
  * @param {QrDataSegment} segments - The segments to encode
  */
 export function encodeData(numDataBytes, level, segments) {
-  const encoded = new Array(numDataBytes).fill(0);
+  const encoded = [];
   const appendBits = makeAppendBits(encoded);
 
   // TODO: atm assumes one segment that is a single utf8 segment
@@ -118,28 +118,35 @@ export function encodeData(numDataBytes, level, segments) {
   appendBits(16, 0b0111000110100100);
   appendBits(level ? 16 : 8, utf8.length);
 
-  for (let i = 0; i < utf8.length; i++) {
-    appendBits(8, utf8[i]);
+  let i = 0;
+  while (i < utf8.length) {
+    appendBits(8, utf8[i++]);
+  }
+
+  i = -1;
+  while (encoded.length < numDataBytes) {
+    appendBits(8, ++i && (i & 1 ? 0b11101100 : 0b00010001));
   }
 
   return encoded;
 }
 
 function makeAppendBits(destination) {
-  let byteIndex = 0;
+  let currentByte = 0;
   let bitsUsedInByte = 0;
 
   function appendBits(numBits, data) {
     bitsUsedInByte += numBits;
+
     while (bitsUsedInByte >= 8) {
       bitsUsedInByte -= 8;
-      destination[byteIndex++] |= (data >> bitsUsedInByte) & 0xff;
+      destination.push(currentByte | ((data >> bitsUsedInByte) & 0xff));
+      currentByte = 0;
     }
 
-    if (bitsUsedInByte) {
-      const remainingMask = (1 << bitsUsedInByte) - 1;
-      destination[byteIndex] |= (data & remainingMask) << (8 - bitsUsedInByte);
-    }
+    // implicitly this code does nothing if bitsUsedInByte === 0
+    const remainingMask = (1 << bitsUsedInByte) - 1;
+    currentByte |= (data & remainingMask) << (8 - bitsUsedInByte);
   }
 
   return appendBits;
