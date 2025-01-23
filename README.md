@@ -36,5 +36,30 @@ document.body.innerHTML = `
   </svg>`;
 ```
 
+If you're using React, make sure to memoize the result to avoid expensive recomputation.
+```javascript
+function QRCode(props) {
+  const { children: data, redundancy = "L" } = props;
+
+  const qr = useMemo(() => makeQrCode(redundancy, data), [redundancy, data]);
+
+  return (
+    <svg
+      width={props.pixels}
+      height={props.pixels}
+      viewBox={`0 0 ${qr.sideLength} ${qr.sideLength}`}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <style>{"path {stroke: black;}"}</style>
+      <path d={qr.path} />
+    </svg>
+  );
+}
+
+function Example() {
+  return <QRCode pixels={320}>Hello, World!</QRCode>;
+}
+```
+
 ## Supported Characters
 QR Codes have several character dictionaries that are optimized. However, for simplicity, this library encodes everything as utf8 (which supports every character). This means that your generated QR Code may be "busier" (more pixels). In theory, it is possible to get better encoding performance for all-numbers or capitalized urls, but that is not implemented in this library. If you're interested in the library generating the most optimized character set, let me know!
